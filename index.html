@@ -17,21 +17,36 @@
   <pre id="result" style="margin-top:12px; background:#f4f4f4; padding:12px;"></pre>
 
   <script>
-    async function askGPT() {
-      const question = document.getElementById("question").value;
+  async function askGPT() {
+    const result = document.getElementById("result");
+    result.textContent = "Envoi de la question au Worker...";
 
-      const res = await fetch(
-        "https://sprinkler-tech-finder-worker.younes-ben-jci.workers.dev",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question })
-        }
-      );
-
-      const data = await res.json();
-      document.getElementById("result").textContent = data.answer;
+    const question = document.getElementById("question").value.trim();
+    if (!question) {
+      result.textContent = "Écris une question d'abord 🙂";
+      return;
     }
-  </script>
+
+    try {
+      const res = await fetch("https://sprinkler-tech-finder-worker.younes-ben-jci.workers.dev", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question })
+      });
+
+      const text = await res.text(); // on lit en texte pour voir même si ce n’est pas du JSON
+      if (!res.ok) {
+        result.textContent = `Erreur HTTP ${res.status}\n\n${text}`;
+        return;
+      }
+
+      const data = JSON.parse(text);
+      result.textContent = data.answer || "(Pas de champ answer dans la réponse)";
+    } catch (e) {
+      result.textContent = "Erreur réseau / JS :\n" + e;
+    }
+  }
+</script>
+
 </body>
 </html>
