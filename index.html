@@ -6,17 +6,31 @@
 </head>
 <body>
   <h1>Sprinkler Tech Finder</h1>
-  <p>✅ Le site fonctionne.</p>
 
-  <button onclick="callWorker()">Tester le Worker</button>
+  <textarea id="question" rows="4" cols="60"
+    placeholder="Pose ta question technique (ex : Quel sprinkler pour un entrepôt OH3 ?)">
+  </textarea>
+  <br><br>
+
+  <button onclick="askGPT()">Interroger le GPT</button>
 
   <pre id="result" style="margin-top:12px; background:#f4f4f4; padding:12px;"></pre>
 
   <script>
-    async function callWorker() {
-      const res = await fetch("https://sprinkler-tech-finder-worker.younes-ben-jci.workers.dev");
+    async function askGPT() {
+      const question = document.getElementById("question").value;
+
+      const res = await fetch(
+        "https://sprinkler-tech-finder-worker.younes-ben-jci.workers.dev",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question })
+        }
+      );
+
       const data = await res.json();
-      document.getElementById("result").textContent = JSON.stringify(data, null, 2);
+      document.getElementById("result").textContent = data.answer;
     }
   </script>
 </body>
