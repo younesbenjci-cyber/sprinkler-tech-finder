@@ -7,6 +7,17 @@
 <body>
   <h1>Sprinkler Tech Finder</h1>
   <p>✅ Le site fonctionne.</p>
-  <p>Étape suivante : intégrer le GPT.</p>
+
+  <button onclick="callWorker()">Tester le Worker</button>
+
+  <pre id="result" style="margin-top:12px; background:#f4f4f4; padding:12px;"></pre>
+
+  <script>
+    async function callWorker() {
+      const res = await fetch("https://sprinkler-tech-finder-worker.younes-ben-jci.workers.dev");
+      const data = await res.json();
+      document.getElementById("result").textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
 </body>
 </html>
