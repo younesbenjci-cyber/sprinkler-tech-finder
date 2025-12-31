@@ -1,4 +1,52 @@
-<iframe
-  src="https://chatgpt.com/g/g-68bafbb4c3548191b7ad5365d0ce06db-tyco-sprinkler-tech-finder"
-  style="width:100%; height:90vh; border:0;"
-></iframe>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Sprinkler Tech Finder</title>
+</head>
+<body>
+  <h1>Sprinkler Tech Finder</h1>
+
+  <textarea id="question" rows="4" cols="60"
+    placeholder="Pose ta question technique (ex : Quel sprinkler pour un entrepôt OH3 ?)">
+  </textarea>
+  <br><br>
+
+  <button onclick="askGPT()">Interroger le GPT</button>
+
+  <pre id="result" style="margin-top:12px; background:#f4f4f4; padding:12px;"></pre>
+
+  <script>
+  async function askGPT() {
+    const result = document.getElementById("result");
+    result.textContent = "Envoi de la question au Worker...";
+
+    const question = document.getElementById("question").value.trim();
+    if (!question) {
+      result.textContent = "Écris une question d'abord 🙂";
+      return;
+    }
+
+    try {
+      const res = await fetch("https://sprinkler-tech-finder-worker.younes-ben-jci.workers.dev", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question })
+      });
+
+      const text = await res.text(); // on lit en texte pour voir même si ce n’est pas du JSON
+      if (!res.ok) {
+        result.textContent = `Erreur HTTP ${res.status}\n\n${text}`;
+        return;
+      }
+
+      const data = JSON.parse(text);
+      result.textContent = data.answer || "(Pas de champ answer dans la réponse)";
+    } catch (e) {
+      result.textContent = "Erreur réseau / JS :\n" + e;
+    }
+  }
+</script>
+
+</body>
+</html>
